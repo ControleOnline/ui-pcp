@@ -1,7 +1,7 @@
 import * as customActions from "./customActions";
-import * as actions from "@controleonline/quasar-default-ui/src/store/default/actions";
-import * as getters from "@controleonline/quasar-default-ui/src/store/default/getters";
-import mutations from "@controleonline/quasar-default-ui/src/store/default/mutations";
+import * as actions from "@controleonline/ui-default/src/store/default/actions";
+import * as getters from "@controleonline/ui-default/src/store/default/getters";
+import mutations from "@controleonline/ui-default/src/store/default/mutations";
 
 
 export default {
