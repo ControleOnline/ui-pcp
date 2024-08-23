@@ -1,29 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import globalStyles from '../../../../../../src/styles/global';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { fetchDisplayType } from '../../store/slices/displaySlice';
-// import { fetchOrdersForQueue, updateOrderStatus } from '../../services/orderService';
+import {fetchDisplayType} from '../../../src/services/displayService';
+import { Dimensions } from 'react-native'; 
+import { Modal } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const DisplayPage = () => {
-    const [orders, setOrders] = useState([]);
-    const [selectedOrder, setSelectedOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [displayType, setDisplayType] = useState('');
-    // const dispatch = useDispatch();
-    // const displayType = useSelector((state) => state.display.displayType);
-    // const displayId = route.params.displayId;
+    // Define os estados iniciais
+    const [orders, setOrders] = useState([]);                       // Armazena os pedidos
+    const [selectedOrder, setSelectedOrder] = useState(null);       // Pedido selecionado para detalhes
+    const [loading, setLoading] = useState(true);                   // Loading
+    const [displayType, setDisplayType] = useState('');             // Tipo de display
+    const [isLandscape, setIsLandscape] = useState(width > height); // Modo paisagem?
+    const [modalVisible, setModalVisible] = useState(false);        // Controla o Modal
+    const [hasDisplay, setHasDisplay] = useState(false);            // Indica se tem displays disponíveis
 
+    // Buscar dados da API ao carregar a tela
     useEffect(() => {
         const fetchData = async () => {
+            console.log('iniciando fetchData');
             try {
-                // dispatch(fetchDisplayType(displayId)); 
-                // const type = await fetchDisplayType(displayId);
-                // setDisplayType(type);
+                // Faz uma requisição para obter displays
+                const displays = await fetchDisplayType();
+                console.log('Displays:', displays);
+                setLoading(false);
 
-                const dummyDisplayType = 'view'; //production
+                // Verifica se há displays retornados pela API
+                const displaysExist = displays && displays.length > 0;
+
+                // Define o estado com base na existência de displays
+                if (!displaysExist) {
+                    setModalVisible(true);
+                    setHasDisplay(false); 
+                } else {
+                    setHasDisplay(true);
+                    setModalVisible(false);
+                }
+
+                const dummyDisplayType = 'view'; // Define o tipo de display (produção ou visualização)
                 setDisplayType(dummyDisplayType);
 
+                // Dados de exemplo para exibir pedidos
                 const dummyOrders = [
                     { id: 1, status: 'Aguardando', customerName: 'Cliente 1', items: ['Sanduíche', 'Batata', 'Observação: Sem cebola'] },
                     { id: 2, status: 'Em preparação', customerName: 'Cliente 2', items: ['Pizza', 'Refrigerante', 'Observação: Extra queijo'] },
@@ -39,10 +58,23 @@ const DisplayPage = () => {
         };
 
         fetchData();
+
+        // Atualiza a orientação da tela mudando as dimensões
+        const updateOrientation = () => {
+            setIsLandscape(Dimensions.get('window').width > Dimensions.get('window').height);
+        };
+
+        // Adiciona um listener pra mudanças
+        const dimensionChangeListener = Dimensions.addEventListener('change', updateOrientation);
+        return () => {
+            dimensionChangeListener.remove();
+        };
     }, []);
 
+    // Função para alterar o status do pedido
     const handleOrderStatusChange = async (orderId, newStatus) => {
         try {
+            // Atualiza o status do pedido na API (se disponível)
             // await updateOrderStatus(orderId, newStatus);
             setOrders(orders.map(order =>
                 order.id === orderId ? { ...order, status: newStatus } : order
@@ -55,19 +87,23 @@ const DisplayPage = () => {
         }
     };
 
+    // Função para renderizar os detalhes de um pedido selecionado
     const renderOrderDetails = (order) => {
         return (
             <ScrollView contentContainerStyle={styles.orderDetails}>
-                <Text style={styles.detailsTitle}>Detalhes do Pedido #{order.id}</Text>
-                <Text style={styles.detailsText}>Cliente: {order.customerName}</Text>
-                <Text style={styles.detailsText}>Status: {order.status}</Text>
-                <Text style={styles.detailsText}>Itens:</Text>
-                {order.items.map((item, index) => (
-                    <Text key={index} style={styles.detailsItem}>{item}</Text>
+                <Text style={[styles.detailsTitle, width > 600 && styles.tabletText]}>Detalhes do Pedido #{order.id}</Text>
+                <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Cliente: {order.client.name}</Text>
+                <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Status: {order.status.status}</Text>
+                <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Itens:</Text>
+                {order.orderProducts.map((orderProduct, index) => (
+                    <View key={index} style={styles.detailsItemContainer}>
+                        <Text style={[styles.detailsItem, width > 600 && styles.tabletText]}>{orderProduct.product.product}</Text>
+                        <Text style={[styles.detailsObservation, width > 600 && styles.tabletText]}>Observação: {orderProduct.product.description}</Text>
+                    </View>
                 ))}
                 {displayType === 'production' && (
                     <View style={styles.buttonContainer}>
-                        {order.status === 'Aguardando' && (
+                        {order.status.status === 'Aguardando' && (
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => handleOrderStatusChange(order.id, 'Em preparação')}
@@ -75,7 +111,7 @@ const DisplayPage = () => {
                                 <Text style={styles.buttonText}>Iniciar Preparação</Text>
                             </TouchableOpacity>
                         )}
-                        {order.status === 'Em preparação' && (
+                        {order.status.status === 'Em preparação' && (
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => handleOrderStatusChange(order.id, 'Finalizado')}
@@ -89,41 +125,72 @@ const DisplayPage = () => {
         );
     };
 
-    if (loading) {
-        return (
-            <View style={globalStyles.loadingContainer}>
-                <Text>Carregando...</Text>
-            </View>
-        );
-    }
+    // Função para criar um novo display
+    const handleCreateDisplay = (type) => {
+        setDisplayType(type);
+        setHasDisplay(true);
+        setModalVisible(false);
+        // API call: dispatch(createDisplay({ name: 'Default Display', status: 'entrada', type }));
+    };
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.orderListContainer}>
-                <Text style={styles.title}>
-                    {displayType === 'view' ? 'Pedidos Disponíveis para Retirada' : 'Pedidos em Preparação'}
-                </Text>
-                <FlatList
-                    data={orders}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.orderItem} onPress={() => displayType === 'production' ? setSelectedOrder(item) : null}>
-                            <Text style={styles.orderText}>Pedido: #{item.id}</Text>
-                            <Text style={styles.orderText}>Status: {item.status}</Text>
-                            <Text style={styles.orderText}>Cliente: {item.customerName}</Text>
+            {/* Modal para selecionar o tipo de display */}
+            <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="slide"
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Selecione o Tipo de Display</Text>
+                        <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => handleCreateDisplay('production')}
+                        >
+                            <Text style={styles.buttonText}>Produção</Text>
                         </TouchableOpacity>
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                />
-            </View>
-            {displayType === 'production' && (
-                <View style={styles.orderDetailsContainer}>
-                    {selectedOrder ? renderOrderDetails(selectedOrder) : <Text style={styles.detailsPlaceholder}>Selecione um pedido para ver os detalhes</Text>}
+                        <TouchableOpacity
+                            style={styles.modalButton}
+                            onPress={() => handleCreateDisplay('view')}
+                        >
+                            <Text style={styles.buttonText}>Visualização</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+            </Modal>
+            {hasDisplay && (
+                <>
+                    {/* Lista de pedidos */}
+                    <View style={[styles.orderListContainer, displayType === 'production' && isLandscape && { flex: 3 }]}>
+                        <Text style={styles.title}>
+                            {displayType === 'view' ? 'Pedidos Disponíveis para Retirada' : 'Pedidos em Preparação'}
+                        </Text>
+                        <FlatList
+                            data={orders}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.orderItem} onPress={() => displayType === 'production' ? setSelectedOrder(item) : null}>
+                                    <Text style={styles.orderText}>Pedido: #{item.id}</Text>
+                                    <Text style={styles.orderText}>Status: {item.status.status}</Text>
+                                    <Text style={styles.orderText}>Cliente: {item.client.name}</Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={(item) => item.id.toString()}
+                        />
+                    </View>
+                    {/* Detalhes do pedido selecionado */}
+                    {displayType === 'production' && (
+                        <View style={[styles.orderDetailsContainer, isLandscape && { flex: 2 }]}>
+                            {selectedOrder ? renderOrderDetails(selectedOrder) : <Text style={styles.detailsPlaceholder}>Selecione um pedido para ver os detalhes</Text>}
+                        </View>
+                    )}
+                </>
             )}
         </SafeAreaView>
     );
 };
 
+// Estilos do componente
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -178,9 +245,17 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 5,
     },
+    detailsItemContainer: {
+        marginBottom: 10,
+    },
     detailsItem: {
         fontSize: 16,
         marginLeft: 10,
+    },
+    detailsObservation: {
+        fontSize: width > 600 ? 14 : 12,
+        marginLeft: 10,
+        color: '#555',
     },
     detailsPlaceholder: {
         fontSize: 18,
