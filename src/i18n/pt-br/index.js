@@ -2,8 +2,6 @@
 // so you can safely delete all default props below
 
 export const translate = {
-  people: "Pessoa",
-
   display: {
     id: "ID",
     displayType: "Tipo",
