@@ -91,7 +91,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 
-import Config from "@controleonline/ui-legacy/ui-common/src/utils/config";
+import Config from "@controleonline/ui-common/src/utils/config";
 
 export default {
   data() {
