@@ -10,9 +10,9 @@
         <q-card-actions>
           <div class="q-gutter-sm items-center row full-width">
             <img
-              :src="getCompanyLogo(display)"
+              :src="$image(display.company.file)"
               class="display current-logo"
-              v-if="getCompanyLogo(display)"
+              v-if="$image(display.company.file)"
             />
             <span v-else> {{ display.company.alias }}</span>
           </div>
@@ -92,13 +92,6 @@ export default {
     ...mapActions({
       getDisplays: "displays/getItems",
     }),
-
-    getCompanyLogo(display) {
-      if (display.company.file.id)
-        return (
-          this.$entrypoint + "/files/" + display.company.file.id + "/download"
-        );
-    },
     onRequest() {
       this.getMyDisplays();
     },
