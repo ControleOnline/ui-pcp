@@ -69,7 +69,6 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 
-
 export default {
   data() {
     return {
@@ -96,7 +95,9 @@ export default {
 
     getCompanyLogo(display) {
       if (display.company.file.id)
-        return this.$entrypoint + "/files/download/" + display.company.file.id;
+        return (
+          this.$entrypoint + "/files/" + display.company.file.id + "/download"
+        );
     },
     onRequest() {
       this.getMyDisplays();
