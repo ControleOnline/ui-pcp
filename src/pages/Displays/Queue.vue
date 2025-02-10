@@ -117,7 +117,7 @@ export default {
 
   methods: {
     ...mapActions({
-      getQueueOrders: "queues/getOrders",
+      getQueueOrders: "pcp/getOrders",
     }),
     onRequest() {
       this.getMyOrders("open", 5);

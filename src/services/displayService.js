@@ -11,7 +11,7 @@ export const fetchDisplayType = async (displayId) => {
 
 export const fetchQueuesForDisplay = async (displayId) => {
     try {
-        const response = await api.fetch('/display_queues', {
+        const response = await api.fetch('/display_pcp', {
             params: { display: `/displays/${displayId}` }
         });
         return response;

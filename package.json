@@ -1,8 +1,8 @@
 {
-    "name": "@controleonline/ui-queues",
+    "name": "@controleonline/ui-pcp",
     "version": "1.0.52",
     "author": "ControleOnline",
-    "description": "ControleOnline queues Quasar UI Component",
+    "description": "ControleOnline pcp Quasar UI Component",
     "license": "MIT",
     "main": "src/index.js",
     "scripts": {},
