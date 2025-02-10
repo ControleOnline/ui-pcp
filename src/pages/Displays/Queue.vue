@@ -14,19 +14,19 @@
             <q-item v-for="(order, index) in orders.open" :key="index">
               <q-item-section avatar>
                 <q-icon
-                  :color="order.orderQueue[0].status.color"
-                  :name="order.orderQueue[0].status.icon || 'local_hospital'"
+                  :color="order.status.color"
+                  :name="order.status.icon || 'local_hospital'"
                 />
               </q-item-section>
 
               <q-item-section>
                 <q-item-label>#{{ order.id }} </q-item-label>
-                <q-item-label caption>{{ order.client.name }}</q-item-label>
+                <q-item-label caption>Nome</q-item-label>
                 <q-item-label
-                  :color="order.orderQueue[0].status.color"
+                  :color="order.status.color"
                   caption
                   >{{
-                    $t("status." + order.orderQueue[0].status.status)
+                    $t("status." + order.status.status)
                   }}</q-item-label
                 >
               </q-item-section>
@@ -57,19 +57,19 @@
                 <q-item>
                   <q-item-section avatar>
                     <q-icon
-                      :color="order.orderQueue[0].status.color"
+                      :color="order.status.color"
                       :name="
-                        order.orderQueue[0].status.icon || 'local_hospital'
+                        order.status.icon || 'local_hospital'
                       "
                     />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label caption>{{ order.client.name }}</q-item-label>
+                    <q-item-label caption>Nome</q-item-label>
                     <q-item-label
-                      :color="order.orderQueue[0].status.color"
+                      :color="order.status.color"
                       caption
                       >{{
-                        $t("status." + order.orderQueue[0].status.status)
+                        $t("status." + order.status.status)
                       }}</q-item-label
                     >
                   </q-item-section>
@@ -78,12 +78,7 @@
             </q-card>
           </div>
         </div>
-        <div class="full-width q-pa-sm video-height">
-          <q-video
-            src="https://www.youtube.com/embed/YriZWDnixWE?rel=0&controls=0&autoplay=true"
-            style="width: 100%px; height: 100%"
-          />
-        </div>
+        <div class="full-width q-pa-sm video-height">Aqui</div>
       </div>
     </div>
   </q-page>
@@ -97,7 +92,6 @@ export default {
   data() {
     return {
       isSearching: false,
-      timeout: 60 * 1000,
       refresh: false,
       config: new Config(),
       orders: {
@@ -109,23 +103,17 @@ export default {
   },
 
   created() {
-    this.timeout =
-      parseFloat(this.config.getConfig("refresh-display-time") || 60) * 1000;
     this.display = decodeURIComponent(this.$route.params.id);
     this.onRequest();
   },
 
   methods: {
     ...mapActions({
-      getQueueOrders: "pcp/getOrders",
+      getQueueOrders: "order_queue/getItems",
     }),
     onRequest() {
       this.getMyOrders("open", 5);
       this.getMyOrders("pending", 3);
-      //this.refresh = setInterval(() => {
-      //  this.getMyOrders("open", 5);
-      //  this.getMyOrders("pending", 3);
-      //}, this.timeout);
     },
 
     getMyOrders(status, rows) {

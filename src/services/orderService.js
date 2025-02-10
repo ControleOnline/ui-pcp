@@ -1,7 +1,7 @@
 
 export const fetchOrdersForQueue = async (queueId) => {
     try {
-        const response = await api.fetch(`/display_pcp/${queueId}`);
+        const response = await api.fetch(`/display_queues/${queueId}`);
         return response.data;
     } catch (error) {
         console.error('Erro ao buscar pedidos para a fila:', error);
