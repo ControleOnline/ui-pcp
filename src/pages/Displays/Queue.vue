@@ -21,7 +21,9 @@
 
               <q-item-section>
                 <q-item-label>#{{ order.id }} </q-item-label>
-                <q-item-label caption>Nome</q-item-label>
+                <q-item-label caption>{{
+                  order.order_product.product.product
+                }}</q-item-label>
                 <q-item-label :color="order.status.color" caption>{{
                   $t("status." + order.status.status)
                 }}</q-item-label>
@@ -58,7 +60,9 @@
                     />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label caption>Nome</q-item-label>
+                    <q-item-label caption>{{
+                      order.order_product.product.product
+                    }}</q-item-label>
                     <q-item-label :color="order.status.color" caption>{{
                       $t("status." + order.status.status)
                     }}</q-item-label>
@@ -129,13 +133,11 @@ export default {
       return this.getOrderProductQueues({
         queue: this.queues,
         itemsPerPage: rows,
-        //"orderQueue.status.realStatus": status,
         status: status_id,
-        //"orderQueue.queue.displayQueue.display": this.display,
+        //"exists[order_product.parentProduct]": "false",
       })
         .then((result) => {
           this.orders[status] = [...this.orders[status], ...result];
-          console.log(this.orders);
         })
         .finally(() => {
           this.isSearching = false;
