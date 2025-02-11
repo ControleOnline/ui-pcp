@@ -11,7 +11,7 @@
           </q-card-section>
           <q-separator />
           <q-list>
-            <q-item v-for="(order, index) in orders.open" :key="index">
+            <q-item v-for="(order, index) in orders['status_in']" :key="index">
               <q-item-section avatar>
                 <q-icon
                   :color="order.status.color"
@@ -22,13 +22,9 @@
               <q-item-section>
                 <q-item-label>#{{ order.id }} </q-item-label>
                 <q-item-label caption>Nome</q-item-label>
-                <q-item-label
-                  :color="order.status.color"
-                  caption
-                  >{{
-                    $t("status." + order.status.status)
-                  }}</q-item-label
-                >
+                <q-item-label :color="order.status.color" caption>{{
+                  $t("status." + order.status.status)
+                }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -44,7 +40,7 @@
           </div>
           <div
             class="col-9 col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 q-pa-sm"
-            v-for="(order, index) in orders.pending"
+            v-for="(order, index) in orders['status_working']"
             :key="index"
           >
             <q-card class="my-card">
@@ -58,20 +54,14 @@
                   <q-item-section avatar>
                     <q-icon
                       :color="order.status.color"
-                      :name="
-                        order.status.icon || 'local_hospital'
-                      "
+                      :name="order.status.icon || 'local_hospital'"
                     />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label caption>Nome</q-item-label>
-                    <q-item-label
-                      :color="order.status.color"
-                      caption
-                      >{{
-                        $t("status." + order.status.status)
-                      }}</q-item-label
-                    >
+                    <q-item-label :color="order.status.color" caption>{{
+                      $t("status." + order.status.status)
+                    }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -94,10 +84,13 @@ export default {
       isSearching: false,
       refresh: false,
       config: new Config(),
+      status_in: null,
+      status_working: null,
+      queues: [],
       orders: {
         display: null,
-        open: [],
-        pending: [],
+        status_in: [],
+        status_working: [],
       },
     };
   },
@@ -109,22 +102,40 @@ export default {
 
   methods: {
     ...mapActions({
-      getQueueOrders: "order_queue/getItems",
+      getOrderProductQueues: "order_products_queue/getItems",
+      getQueuesFromDisplay: "display_queues/getItems",
     }),
     onRequest() {
-      this.getMyOrders("open", 5);
-      this.getMyOrders("pending", 3);
+      this.orders["status_in"] = [];
+      this.orders["status_working"] = [];
+
+      this.getQueuesFromDisplay({
+        diaplay: this.display,
+      }).then((reult) => {
+        reult.forEach((item, i) => {
+          this.queues.push(item.queue.id);
+          this.status_in = item.display.status_in;
+          this.status_working = item.display.status_working;
+
+          this.getMyOrders("status_in", item.display.status_in, 3);
+          this.getMyOrders("status_working", item.display.status_working, 3);
+        });
+      });
     },
 
-    getMyOrders(status, rows) {
+    getMyOrders(status, status_id, rows) {
+      if (!this.queues) return;
       this.isSearching = true;
-      return this.getQueueOrders({
+      return this.getOrderProductQueues({
+        queue: this.queues,
         itemsPerPage: rows,
-        "orderQueue.status.realStatus": status,
-        "orderQueue.queue.displayQueue.display": this.display,
+        //"orderQueue.status.realStatus": status,
+        status: status_id,
+        //"orderQueue.queue.displayQueue.display": this.display,
       })
         .then((result) => {
-          this.orders[status] = result;
+          this.orders[status] = [...this.orders[status], ...result];
+          console.log(this.orders);
         })
         .finally(() => {
           this.isSearching = false;
