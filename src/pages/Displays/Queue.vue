@@ -110,7 +110,7 @@ export default {
       this.orders["status_working"] = [];
 
       this.getQueuesFromDisplay({
-        diaplay: this.display,
+        display: this.display,
       }).then((reult) => {
         reult.forEach((item, i) => {
           this.queues.push(item.queue.id);
