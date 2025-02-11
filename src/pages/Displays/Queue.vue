@@ -6,8 +6,7 @@
       >
         <q-card class="my-card full-height">
           <q-card-section>
-            <div class="text-h6">Em Preparação</div>
-            <div class="text-subtitle">Próximos pedidos</div>
+            <div class="text-subtitle">{{ status_in }}</div>
           </q-card-section>
           <q-separator />
           <q-list>
@@ -38,7 +37,7 @@
       >
         <div class="row justify-center">
           <div class="col-12 justify-center text-center">
-            <div class="text-subtitle">Disponível para retirada</div>
+            <div class="text-subtitle">{{ this.status_working }}</div>
           </div>
           <div
             class="col-9 col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 q-pa-sm"
