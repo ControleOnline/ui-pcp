@@ -1,12 +1,14 @@
 <template>
-  <q-page class="bg-grey">
+  <q-page class="bg-grey" v-if="loaded">
     <div class="row full-height-vh">
       <div
         class="col-3 col-xs-12 col-sm-12 col-md-12 col-lg-3 col-xl-3 q-pa-sm"
       >
         <q-card class="my-card full-height">
           <q-card-section>
-            <div class="text-subtitle">{{ status_in }}</div>
+            <div class="text-subtitle">
+              {{ $tt("display", "title", status_in.status) }}
+            </div>
           </q-card-section>
           <q-separator />
           <q-list>
@@ -37,7 +39,9 @@
       >
         <div class="row justify-center">
           <div class="col-12 justify-center text-center">
-            <div class="text-subtitle">{{ this.status_working }}</div>
+            <div class="text-subtitle">
+              {{ $tt("display", "title", status_working.status) }}
+            </div>
           </div>
           <div
             class="col-9 col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 q-pa-sm"
@@ -84,8 +88,8 @@ import Config from "@controleonline/ui-common/src/utils/config";
 export default {
   data() {
     return {
+      loaded: false,
       isSearching: false,
-      refresh: false,
       config: new Config(),
       status_in: null,
       status_working: null,
@@ -114,16 +118,24 @@ export default {
 
       this.getQueuesFromDisplay({
         display: this.display,
-      }).then((reult) => {
-        reult.forEach((item, i) => {
-          this.queues.push(item.queue.id);
-          this.status_in = item.display.status_in;
-          this.status_working = item.display.status_working;
+      })
+        .then((reult) => {
+          reult.forEach((item, i) => {
+            this.queues.push(item.queue.id);
+            this.status_in = item.display.status_in;
+            this.status_working = item.display.status_working;
 
-          this.getMyOrders("status_in", item.display.status_in, 3);
-          this.getMyOrders("status_working", item.display.status_working, 3);
+            this.getMyOrders("status_in", item.display.status_in.id, 3);
+            this.getMyOrders(
+              "status_working",
+              item.display.status_working.id,
+              3
+            );
+          });
+        })
+        .finally(() => {
+          this.loaded = true;
         });
-      });
     },
 
     getMyOrders(status, status_id, rows) {
