@@ -122,15 +122,11 @@ export default {
         .then((reult) => {
           reult.forEach((item, i) => {
             this.queues.push(item.queue.id);
-            this.status_in = item.display.status_in;
-            this.status_working = item.display.status_working;
+            this.status_in = item.queue.status_in;
+            this.status_working = item.queue.status_working;
 
-            this.getMyOrders("status_in", item.display.status_in.id, 3);
-            this.getMyOrders(
-              "status_working",
-              item.display.status_working.id,
-              3
-            );
+            this.getMyOrders("status_in", item.queue.status_in.id, 3);
+            this.getMyOrders("status_working", item.queue.status_working.id, 3);
           });
         })
         .finally(() => {
