@@ -12,6 +12,7 @@
         :order="orders['status_working'][0]"
         :status_working="status_working"
         :status_out="status_out"
+        @reload="onRequest"
       />
 
       <InOut
@@ -65,6 +66,7 @@ export default {
     onRequest() {
       this.orders["status_in"] = [];
       this.orders["status_working"] = [];
+      this.orders["status_out"] = [];
 
       this.getQueuesFromDisplay({
         display: this.display,
