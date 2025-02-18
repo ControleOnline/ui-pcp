@@ -8,8 +8,7 @@
         @reload="onRequest"
       />
       <Working
-        v-if="orders['status_working'] && orders['status_working'][0]"
-        :order="orders['status_working'][0]"
+        :orders="orders['status_working']"
         :status_working="status_working"
         :status_out="status_out"
         @reload="onRequest"
@@ -79,7 +78,7 @@ export default {
             this.status_out = item.queue.status_out;
 
             this.getMyOrders("status_in", item.queue.status_in.id, 6);
-            this.getMyOrders("status_working", item.queue.status_working.id, 1);
+            this.getMyOrders("status_working", item.queue.status_working.id, 6);
             this.getMyOrders("status_out", item.queue.status_out.id, 6);
           });
         })

@@ -4,7 +4,6 @@
       <q-card
         v-for="display in displays"
         :key="display.id"
-        @click="openDisplay(display)"
         class="display-card col-4 col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-3"
       >
         <q-card-actions>
@@ -62,6 +61,13 @@
             {{ $t("display.messages." + display.displayType) }}
           </div>
         </q-card-section>
+        <q-card-section class="full-width">
+          <q-btn
+            @click="openDisplay(display)"
+            label="Open"
+            class="btn-primary full-width"
+          ></q-btn>
+        </q-card-section>
       </q-card>
     </div>
   </q-page>
@@ -82,6 +88,7 @@ export default {
     },
     ...mapGetters({
       defaultCompany: "people/defaultCompany",
+      myCompany: "people/currentCompany",
     }),
   },
   created() {
@@ -103,7 +110,9 @@ export default {
     },
     getMyDisplays() {
       this.isSearching = true;
-      return this.getDisplays()
+      return this.getDisplays({
+        company: this.myCompany.id,
+      })
         .then((result) => {
           this.displays = result;
         })
@@ -117,7 +126,6 @@ export default {
 
 <style scoped>
 .display-card {
-  cursor: pointer;
   transition: box-shadow 0.3s ease;
 }
 
