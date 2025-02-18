@@ -52,7 +52,6 @@ export default {
       },
     };
   },
-
   created() {
     this.display = decodeURIComponent(this.$route.params.id);
     this.onRequest();
