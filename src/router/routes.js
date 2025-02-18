@@ -11,7 +11,7 @@ export const routes = [
       {
         name: "displayDetails",
         path: "id/:id",
-        component: () => import("../pages/Displays/Queue.vue"),
+        component: () => import("../pages/Displays/Details.vue"),
       }
     ],
   },

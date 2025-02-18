@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 q-pa-sm" v-if="groups">
+  <div class="col-12 q-pa-sm">
     <q-card class="full-width">
       <q-card-section>
         <div class="text-subtitle">
@@ -36,48 +36,8 @@
               </q-item-label>
             </q-card-section>
             <q-card-section>
-              <q-list bordered separator>
-                <q-expansion-item
-                  v-for="(products, groupId) in products"
-                  :key="groupId"
-                  expand-separator
-                  :label="products[0].productGroup.productGroup"
-                >
-                  <q-item v-for="product in products" :key="product.id">
-                    <q-item-section>
-                      <q-item-label>{{ product.product.product }}</q-item-label>
-                      <q-item-label caption
-                        >Preço: R$ {{ product.price }}</q-item-label
-                      >
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-badge
-                        :label="'x' + product.quantity"
-                        color="primary"
-                      />
-                    </q-item-section>
-                  </q-item>
-                </q-expansion-item>
-              </q-list>
+              <OrderProductComponents :order_product="order.order_product" />
             </q-card-section>
-
-            <q-list bordered separator>
-              <div v-for="(group, groupId) in groups[index]" :key="groupId">
-                <span>{{ group.productGroup }}</span>
-                <q-item v-for="product in group.products" :key="product.id">
-                  <q-item-section side>
-                    <q-badge :label="'x' + product.quantity" color="primary" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>{{ product.product.product }}</q-item-label>
-                    <q-item-label caption
-                      >Preço: R$ {{ product.price }}</q-item-label
-                    >
-                  </q-item-section>
-                </q-item>
-              </div>
-            </q-list>
-
             <q-card-actions v-if="status_out">
               <q-btn
                 class="full-width"
@@ -94,8 +54,12 @@
 </template>
 <script>
 import { mapActions, mapGetters } from "vuex";
+import OrderProductComponents from "@controleonline/ui-products/src/pages/components/OrderProductComponents";
 
 export default {
+  components: {
+    OrderProductComponents,
+  },
   props: {
     status_working: {
       default: null,
@@ -108,44 +72,13 @@ export default {
     },
   },
   data() {
-    return {
-      groups: [],
-    };
+    return {};
   },
-  created() {
-    this.getProducts();
-  },
+  created() {},
   methods: {
     ...mapActions({
       setOrderProductQueues: "order_products_queue/save",
-      getOrderProducts: "product_orders/getItems",
     }),
-    getProducts() {
-      console.log(this.orders);
-      if (!this.orders) return;
-      let groups = [];
-      this.orders.forEach((order, i) => {
-        let filter = {
-          order: order.order_product.order["@id"],
-          parentProduct: order.order_product.product["@id"],
-          orderProduct: order.order_product["@id"],
-        };
-
-        this.getOrderProducts(filter).then((products) => {
-          let grouped = products.reduce((acc, product) => {
-            if (!product.productGroup) return acc;
-            const groupId = product.productGroup.id;
-            if (!acc[groupId]) acc[groupId] = product.productGroup;
-            if (!acc[groupId]["products"]) acc[groupId]["products"] = [];
-            acc[groupId]["products"].push(product);
-            return acc;
-          }, {});
-
-          groups[i] = grouped;
-        });
-      });
-      if (groups.length == this.orders.length) this.groups = groups;
-    },
 
     finalize(order) {
       this.setOrderProductQueues({

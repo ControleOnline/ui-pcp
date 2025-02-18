@@ -1,22 +1,24 @@
 <template>
-  <q-page v-if="loaded">
+  <q-page>
     <div class="row full-height-vh">
       <InOut
+        v-if="loaded['status_in']"
+        :orders="orders['status_in']"
         :status_in="status_in"
         :status_working="status_working"
-        :orders="orders['status_in']"
         @reload="onRequest"
       />
       <Working
+        v-if="loaded['status_working']"
         :orders="orders['status_working']"
         :status_working="status_working"
         :status_out="status_out"
         @reload="onRequest"
       />
-
       <InOut
-        :status_in="status_out"
+        v-if="loaded['status_out']"
         :orders="orders['status_out']"
+        :status_in="status_out"
         @reload="onRequest"
       />
     </div>
@@ -36,8 +38,7 @@ export default {
   },
   data() {
     return {
-      loaded: false,
-      isSearching: false,
+      loaded: [],
       config: new Config(),
       status_in: null,
       status_working: null,
@@ -69,28 +70,24 @@ export default {
 
       this.getQueuesFromDisplay({
         display: this.display,
-      })
-        .then((reult) => {
-          reult.forEach((item, i) => {
-            this.queues.push(item.queue.id);
-            this.status_in = item.queue.status_in;
-            this.status_working = item.queue.status_working;
-            this.status_out = item.queue.status_out;
+      }).then((reult) => {
+        reult.forEach((item, i) => {
+          this.queues.push(item.queue.id);
+          this.status_in = item.queue.status_in;
+          this.status_working = item.queue.status_working;
+          this.status_out = item.queue.status_out;
 
-            this.getMyOrders("status_in", item.queue.status_in.id, 6);
-            this.getMyOrders("status_working", item.queue.status_working.id, 6);
-            this.getMyOrders("status_out", item.queue.status_out.id, 6);
-          });
-        })
-        .finally(() => {
-          this.loaded = true;
+          this.getMyOrders("status_in", item.queue.status_in.id, 6);
+          this.getMyOrders("status_working", item.queue.status_working.id, 6);
+          this.getMyOrders("status_out", item.queue.status_out.id, 6);
         });
+      });
     },
 
-    getMyOrders(status, status_id, rows) {
+    async getMyOrders(status, status_id, rows) {
       if (!this.queues) return;
-      this.isSearching = true;
-      return this.getOrderProductQueues({
+
+      return await this.getOrderProductQueues({
         queue: this.queues,
         itemsPerPage: rows,
         status: status_id,
@@ -100,7 +97,7 @@ export default {
           this.orders[status] = [...this.orders[status], ...result];
         })
         .finally(() => {
-          this.isSearching = false;
+          this.loaded[status] = true;
         });
     },
   },
