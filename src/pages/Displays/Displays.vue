@@ -83,10 +83,8 @@ export default {
     };
   },
   computed: {
-    user() {
-      return this.$store.getters["auth/user"];
-    },
     ...mapGetters({
+      user: "auth/user",
       defaultCompany: "people/defaultCompany",
       myCompany: "people/currentCompany",
     }),
