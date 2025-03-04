@@ -7,6 +7,7 @@ export default {
   state: {
  item:{},
 items:[],
+filters:{},
     resourceEndpoint: "display_queues",
     isLoading: false,
     error: "",

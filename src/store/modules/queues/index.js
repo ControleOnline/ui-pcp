@@ -5,8 +5,9 @@ import mutations from "@controleonline/ui-default/src/store/default/mutations";
 export default {
   namespaced: true,
   state: {
- item:{},
-items:[],
+    item: {},
+    items: [],
+    filters: {},
     resourceEndpoint: "queues",
     isLoading: false,
     error: "",
