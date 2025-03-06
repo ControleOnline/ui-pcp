@@ -93,7 +93,7 @@ const DisplayPage = () => {
             <ScrollView contentContainerStyle={styles.orderDetails}>
                 <Text style={[styles.detailsTitle, width > 600 && styles.tabletText]}>Detalhes do Pedido #{order.id}</Text>
                 <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Cliente: {order.client.name}</Text>
-                <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Status: {order.status.status}</Text>
+                <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Status: {order.status?.status}</Text>
                 <Text style={[styles.detailsText, width > 600 && styles.tabletText]}>Itens:</Text>
                 {order.orderProducts.map((orderProduct, index) => (
                     <View key={index} style={styles.detailsItemContainer}>
@@ -103,7 +103,7 @@ const DisplayPage = () => {
                 ))}
                 {displayType === 'production' && (
                     <View style={styles.buttonContainer}>
-                        {order.status.status === 'Aguardando' && (
+                        {order.status?.status === 'Aguardando' && (
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => handleOrderStatusChange(order.id, 'Em preparação')}
@@ -111,7 +111,7 @@ const DisplayPage = () => {
                                 <Text style={styles.buttonText}>Iniciar Preparação</Text>
                             </TouchableOpacity>
                         )}
-                        {order.status.status === 'Em preparação' && (
+                        {order.status?.status === 'Em preparação' && (
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => handleOrderStatusChange(order.id, 'Finalizado')}

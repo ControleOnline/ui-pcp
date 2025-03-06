@@ -23,12 +23,12 @@
               </q-item-label>
               <q-item-label caption>
                 <q-icon
-                  v-if="order.status.icon"
-                  :color="order.status.color"
-                  :name="order.status.icon"
+                  v-if="order.status?.icon"
+                  :color="order.status?.color"
+                  :name="order.status?.icon"
                   class="q-mr-sm"
                 />
-                {{ $tt("display", "label", order.status.status) }}
+                {{ $tt("display", "label", order.status?.status) }}
               </q-item-label>
               <q-item-label>
                 {{ order.order_product.quantity }}
