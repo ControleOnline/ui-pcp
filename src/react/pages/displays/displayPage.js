@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import globalStyles from '../../../../../../src/styles/global';
-import {fetchDisplayType} from '../../../src/services/displayService';
+import globalStyles from '../../../../../../src/vue/styles/global';
+import {fetchDisplayType} from '../../../src/vue/services/displayService';
 import { Dimensions } from 'react-native'; 
 import { Modal } from 'react-native';
 

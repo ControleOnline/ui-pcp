@@ -54,7 +54,7 @@
 </template>
 <script>
 import { mapActions, mapGetters } from "vuex";
-import OrderProductComponents from "@controleonline/ui-products/src/pages/components/OrderProductComponents";
+import OrderProductComponents from "@controleonline/ui-products/src/vue/pages/components/OrderProductComponents";
 
 export default {
   components: {
