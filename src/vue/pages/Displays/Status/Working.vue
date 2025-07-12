@@ -37,7 +37,10 @@
                     })
                   }}
                 </q-item-label>
-                <q-item-label caption>
+                <q-item-label
+                  caption
+                  v-if="order.registerTime != order.updateTime"
+                >
                   Iniciou nesse status:
                   {{
                     new Date(order.updateTime).toLocaleTimeString("pt-BR", {
