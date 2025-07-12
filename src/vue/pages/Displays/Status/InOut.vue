@@ -30,7 +30,24 @@
                   :name="order.status?.icon"
                   class="q-mr-sm"
                 />
-                {{ $tt("display", "label", order.status?.status) }}
+                <q-item-label caption>
+                  Horário do pedido:
+                  {{
+                    new Date(order.registerTime).toLocaleTimeString("pt-BR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  }}
+                </q-item-label>
+                <q-item-label caption>
+                  Iniciou nesse status:
+                  {{
+                    new Date(order.updateTime).toLocaleTimeString("pt-BR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  }}
+                </q-item-label>
               </q-item-label>
             </q-card-section>
             <q-card-section>
