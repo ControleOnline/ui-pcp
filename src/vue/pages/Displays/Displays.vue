@@ -92,7 +92,11 @@ export default {
   created() {
     this.onRequest();
   },
-
+  watch: {
+    myCompany(company) {
+      this.onRequest();
+    },
+  },
   methods: {
     ...mapActions({
       getDisplays: "displays/getItems",

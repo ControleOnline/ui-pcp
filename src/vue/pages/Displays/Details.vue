@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import InOut from "./Status/InOut.vue";
 import Working from "./Status/Working.vue";
 import Config from "@controleonline/ui-common/src/utils/config";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   components: {
@@ -55,6 +55,17 @@ export default {
   created() {
     this.display = decodeURIComponent(this.$route.params.id);
     this.onRequest();
+  },
+  computed: {
+    ...mapGetters({
+      myCompany: "people/currentCompany",
+      user: "auth/user",
+    }),
+  },
+  watch: {
+    myCompany(company) {
+      this.onRequest();
+    },
   },
   methods: {
     ...mapActions({
@@ -106,6 +117,7 @@ export default {
       return await this.getOrderProductQueues({
         status: status_ids,
         itemsPerPage: rows,
+        "order_product.order.provider": this.myCompany.id,
       })
         .then((result) => {
           this.orders[status] = result;
