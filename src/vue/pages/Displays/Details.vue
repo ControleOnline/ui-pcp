@@ -24,11 +24,11 @@
     </div>
   </q-page>
 </template>
+
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import InOut from "./Status/InOut.vue";
 import Working from "./Status/Working.vue";
-
 import Config from "@controleonline/ui-common/src/utils/config";
 
 export default {
@@ -56,44 +56,59 @@ export default {
     this.display = decodeURIComponent(this.$route.params.id);
     this.onRequest();
   },
-
   methods: {
     ...mapActions({
       getOrderProductQueues: "order_products_queue/getItems",
       getQueuesFromDisplay: "display_queues/getItems",
     }),
-    onRequest() {
-      this.orders["status_in"] = [];
-      this.orders["status_working"] = [];
-      this.orders["status_out"] = [];
 
-      this.getQueuesFromDisplay({
-        display: this.display,
-      }).then((reult) => {
-        reult.forEach((item, i) => {
-          this.queues.push(item.queue.id);
-          this.status_in = item.queue.status_in;
-          this.status_working = item.queue.status_working;
-          this.status_out = item.queue.status_out;
+    async onRequest() {
+      this.orders.status_in = [];
+      this.orders.status_working = [];
+      this.orders.status_out = [];
+      this.loaded = [];
 
-          this.getMyOrders("status_in", item.queue.status_in.id, 6);
-          this.getMyOrders("status_working", item.queue.status_working.id, 6);
-          this.getMyOrders("status_out", item.queue.status_out.id, 6);
-        });
+      const rows = this.getResponsiveItemsPerPage();
+
+      const result = await this.getQueuesFromDisplay({ display: this.display });
+
+      const statusInIds = [];
+      const statusWorkingIds = [];
+      const statusOutIds = [];
+
+      result.forEach((item) => {
+        this.queues.push(item.queue.id);
+        statusInIds.push(item.queue.status_in.id);
+        statusWorkingIds.push(item.queue.status_working.id);
+        statusOutIds.push(item.queue.status_out.id);
+
+        this.status_in = item.queue.status_in;
+        this.status_working = item.queue.status_working;
+        this.status_out = item.queue.status_out;
       });
+
+      await Promise.all([
+        this.getMyOrders("status_in", statusInIds, rows),
+        this.getMyOrders("status_working", statusWorkingIds, rows),
+        this.getMyOrders("status_out", statusOutIds, rows),
+      ]);
     },
 
-    async getMyOrders(status, status_id, rows) {
-      if (!this.queues) return;
+    getResponsiveItemsPerPage() {
+      if (this.$q.screen.gt.md) return 6;
+      if (this.$q.screen.gt.xs) return 4;
+      return 1;
+    },
+
+    async getMyOrders(status, status_ids, rows) {
+      if (!status_ids.length) return;
 
       return await this.getOrderProductQueues({
-        queue: this.queues,
+        status: status_ids,
         itemsPerPage: rows,
-        status: status_id,
-        //"exists[order_product.parentProduct]": "false",
       })
         .then((result) => {
-          this.orders[status] = [...this.orders[status], ...result];
+          this.orders[status] = result;
         })
         .finally(() => {
           this.loaded[status] = true;

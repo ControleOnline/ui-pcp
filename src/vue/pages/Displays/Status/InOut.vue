@@ -21,7 +21,7 @@
                 }}
               </q-item-label>
               <q-item-label>
-                {{ order.order_product.order.client.name }}
+                {{ order.order_product.order.client?.name }}
               </q-item-label>
               <q-item-label caption>
                 <q-icon
